@@ -27,6 +27,7 @@ class LessonController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'subject' => 'nullable|string|max:255',
             'video_type' => 'required|in:youtube,vimeo,upload',
             'video_url' => 'nullable|url|max:500',
             'author_name' => 'nullable|string|max:255',
@@ -44,7 +45,7 @@ class LessonController extends Controller
             'translations.*.activity_content' => 'nullable|string',
         ]);
 
-        $data['slug'] = Str::slug($data['title']) . '-' . Str::random(4);
+        $data['slug'] = Str::slug($data['title']).'-'.Str::random(4);
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail_path'] = $request->file('thumbnail')->store('images/lessons', 'public');
@@ -80,6 +81,7 @@ class LessonController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'subject' => 'nullable|string|max:255',
             'video_type' => 'required|in:youtube,vimeo,upload',
             'video_url' => 'nullable|url|max:500',
             'author_name' => 'nullable|string|max:255',
