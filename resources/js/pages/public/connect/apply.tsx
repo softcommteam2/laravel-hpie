@@ -1,9 +1,9 @@
+import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import PublicLayout from '@/layouts/public-layout';
-import { useForm } from '@inertiajs/react';
 
 interface Props {
     totalLessons: number;

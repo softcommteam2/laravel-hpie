@@ -1,9 +1,9 @@
+import { router } from '@inertiajs/react';
+import { ExternalLinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PublicLayout from '@/layouts/public-layout';
 import type { Speaker } from '@/types';
-import { router } from '@inertiajs/react';
-import { ExternalLinkIcon } from 'lucide-react';
 
 interface Props {
     speakers: Speaker[];

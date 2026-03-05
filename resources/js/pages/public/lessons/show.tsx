@@ -1,10 +1,10 @@
+import { router } from '@inertiajs/react';
+import { CheckCircleIcon } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PublicLayout from '@/layouts/public-layout';
 import type { Lesson, LessonTranslation } from '@/types';
-import { router } from '@inertiajs/react';
-import { CheckCircleIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
 
 interface Props {
     lesson: Lesson;

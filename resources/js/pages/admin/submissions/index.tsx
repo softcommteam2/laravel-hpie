@@ -1,10 +1,10 @@
+import { Link } from '@inertiajs/react';
+import { EyeIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import type { CertificateApplication, Feedback } from '@/types';
-import { Link } from '@inertiajs/react';
-import { EyeIcon } from 'lucide-react';
 
 interface Props {
     feedbacks: Feedback[];

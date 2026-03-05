@@ -1,7 +1,7 @@
+import { CalendarIcon, MailIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import type { Contact } from '@/types';
-import { CalendarIcon, MailIcon } from 'lucide-react';
 
 interface Props {
     contacts: Contact[];

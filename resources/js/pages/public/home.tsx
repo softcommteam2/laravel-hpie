@@ -1,8 +1,8 @@
+import { Link } from '@inertiajs/react';
+import { BookOpenIcon, AwardIcon, UsersIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import type { Page } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpenIcon, AwardIcon, UsersIcon } from 'lucide-react';
 
 interface Props {
     page: Page;

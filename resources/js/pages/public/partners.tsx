@@ -1,6 +1,6 @@
+import { ExternalLinkIcon, MailIcon, PhoneIcon } from 'lucide-react';
 import PublicLayout from '@/layouts/public-layout';
 import type { Partner } from '@/types';
-import { ExternalLinkIcon, MailIcon, PhoneIcon } from 'lucide-react';
 
 interface Props {
     partners: Partner[];

@@ -1,3 +1,5 @@
+import { useForm } from '@inertiajs/react';
+import { PlusIcon, TrashIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -5,8 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { Lesson } from '@/types';
-import { useForm } from '@inertiajs/react';
-import { PlusIcon, TrashIcon } from 'lucide-react';
 
 interface TranslationForm {
     locale: string;

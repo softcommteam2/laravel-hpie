@@ -1,8 +1,8 @@
+import { Link, usePage } from '@inertiajs/react';
+import { MenuIcon } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Link, usePage } from '@inertiajs/react';
-import { MenuIcon } from 'lucide-react';
 
 const navLinks = [
     { label: 'Home', href: '/' },

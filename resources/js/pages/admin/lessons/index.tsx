@@ -1,10 +1,10 @@
+import { Link, router } from '@inertiajs/react';
+import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import type { Lesson } from '@/types';
-import { Link, router } from '@inertiajs/react';
-import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 
 interface Props {
     lessons: Lesson[];

@@ -1,7 +1,7 @@
+import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import PublicLayout from '@/layouts/public-layout';
 import type { Page } from '@/types';
-import { Link } from '@inertiajs/react';
 
 interface Props {
     page: Page;

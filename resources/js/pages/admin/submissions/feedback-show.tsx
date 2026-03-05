@@ -1,7 +1,7 @@
+import { Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { Feedback } from '@/types';
-import { Link, router } from '@inertiajs/react';
 
 interface Props { feedback: Feedback; }
 

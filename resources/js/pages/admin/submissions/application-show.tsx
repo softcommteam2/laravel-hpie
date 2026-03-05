@@ -1,3 +1,4 @@
+import { Link, useForm } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -5,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { CertificateApplication } from '@/types';
-import { Link, useForm } from '@inertiajs/react';
 
 interface Props { application: CertificateApplication; }
 

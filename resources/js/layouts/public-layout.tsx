@@ -1,7 +1,7 @@
-import PublicFooter from '@/components/public-footer';
-import PublicHeader from '@/components/public-header';
 import { Head } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
+import PublicFooter from '@/components/public-footer';
+import PublicHeader from '@/components/public-header';
 
 interface PublicLayoutProps extends PropsWithChildren {
     title?: string;

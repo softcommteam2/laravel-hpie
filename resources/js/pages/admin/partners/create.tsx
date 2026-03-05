@@ -1,9 +1,9 @@
+import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { useForm } from '@inertiajs/react';
 
 export default function PartnersCreate() {
     const { data, setData, post, processing, errors } = useForm({

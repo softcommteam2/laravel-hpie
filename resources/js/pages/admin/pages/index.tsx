@@ -1,9 +1,9 @@
+import { Link } from '@inertiajs/react';
+import { PencilIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import type { Page } from '@/types';
-import { Link } from '@inertiajs/react';
-import { PencilIcon } from 'lucide-react';
 
 interface Props { pages: Page[]; }
 
