@@ -8,7 +8,6 @@ use App\Models\CertificateApplication;
 use App\Models\Contact;
 use App\Models\Feedback;
 use App\Models\Lesson;
-use App\Models\LessonCompletion;
 use App\Models\Speaker;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
