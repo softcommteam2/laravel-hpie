@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lesson;
 use App\Models\LessonCompletion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class LessonController extends Controller
@@ -41,7 +42,7 @@ class LessonController extends Controller
         ]);
     }
 
-    public function show(string $slug)
+    public function show(Request $request, string $slug)
     {
         $lesson = Lesson::where('slug', $slug)
             ->where('is_published', true)
@@ -49,23 +50,36 @@ class LessonController extends Controller
             ->firstOrFail();
 
         $lesson->increment('view_count');
+        $completionEmail = $request->session()->get('lesson_completion_email');
+        $isCompleted = false;
+
+        if ($completionEmail) {
+            $isCompleted = LessonCompletion::where('lesson_id', $lesson->id)
+                ->where('email', $completionEmail)
+                ->exists();
+        }
 
         return Inertia::render('public/lessons/show', [
             'lesson' => $lesson,
-            'isCompleted' => false,
+            'isCompleted' => $isCompleted,
+            'completionEmail' => $completionEmail ?? '',
         ]);
     }
 
     public function complete(Request $request, string $slug)
     {
-        $request->validate(['email' => 'required|email']);
+        $validated = $request->validate(['email' => 'required|email']);
+        $email = Str::lower(trim($validated['email']));
 
-        $lesson = Lesson::where('slug', $slug)->firstOrFail();
+        $lesson = Lesson::where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
 
         LessonCompletion::firstOrCreate(
-            ['email' => $request->email, 'lesson_id' => $lesson->id],
+            ['email' => $email, 'lesson_id' => $lesson->id],
             ['completed_at' => now()]
         );
+        $request->session()->put('lesson_completion_email', $email);
 
         return back();
     }

@@ -1,4 +1,5 @@
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,20 +9,66 @@ import PublicLayout from '@/layouts/public-layout';
 interface Props {
     totalLessons: number;
     completedLessons: number;
+    progressEmail: string;
 }
 
-export default function ApplyForm({ totalLessons, completedLessons }: Props) {
+const PROGRESS_DEBOUNCE_MS = 400;
+
+export default function ApplyForm({
+    totalLessons,
+    completedLessons,
+    progressEmail,
+}: Props) {
     const { data, setData, post, processing, errors, reset, wasSuccessful } = useForm({
         name: '',
-        email: '',
+        email: progressEmail ?? '',
         phone: '',
         institution: '',
         program: '',
         statement: '',
     });
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const progressPercent = useMemo(() => {
+        if (totalLessons <= 0) return 0;
+        return Math.min(100, (completedLessons / totalLessons) * 100);
+    }, [completedLessons, totalLessons]);
+
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+        };
+    }, []);
+
+    function scheduleProgressLookup(nextEmail: string) {
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = setTimeout(() => {
+            const normalizedEmail = nextEmail.trim().toLowerCase();
+            router.get(
+                '/connect/apply',
+                normalizedEmail ? { email: normalizedEmail } : {},
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                    only: ['totalLessons', 'completedLessons', 'progressEmail'],
+                },
+            );
+            debounceRef.current = null;
+        }, PROGRESS_DEBOUNCE_MS);
+    }
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+            debounceRef.current = null;
+        }
         post('/connect/apply', { onSuccess: () => reset() });
     }
 
@@ -39,7 +86,7 @@ export default function ApplyForm({ totalLessons, completedLessons }: Props) {
                     <div className="mt-2 h-2 w-full rounded-full bg-muted">
                         <div
                             className="h-2 rounded-full bg-primary transition-all"
-                            style={{ width: totalLessons > 0 ? `${(completedLessons / totalLessons) * 100}%` : '0%' }}
+                            style={{ width: `${progressPercent}%` }}
                         />
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -62,7 +109,17 @@ export default function ApplyForm({ totalLessons, completedLessons }: Props) {
                         </div>
                         <div>
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} className="mt-1" />
+                            <Input
+                                id="email"
+                                type="email"
+                                value={data.email}
+                                onChange={(e) => {
+                                    const nextEmail = e.target.value;
+                                    setData('email', nextEmail);
+                                    scheduleProgressLookup(nextEmail);
+                                }}
+                                className="mt-1"
+                            />
                             {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
                         </div>
                     </div>

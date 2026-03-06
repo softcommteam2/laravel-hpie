@@ -114,4 +114,19 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Access Emails
+    |--------------------------------------------------------------------------
+    |
+    | Comma-separated email allowlist for admin-only routes and admin login.
+    | Example: ADMIN_EMAILS=admin@hpie.org,owner@example.com
+    |
+    */
+
+    'admin_emails' => array_values(array_filter(array_map(
+        fn (string $email): string => mb_strtolower(trim($email)),
+        explode(',', (string) env('ADMIN_EMAILS', 'admin@hpie.org'))
+    ))),
+
 ];

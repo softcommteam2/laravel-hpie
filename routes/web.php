@@ -24,7 +24,9 @@ Route::post('/connect/apply', [ConnectController::class, 'submitApplication'])->
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::middleware('admin')->group(function () {
+        Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    });
 });
 
 require __DIR__.'/settings.php';

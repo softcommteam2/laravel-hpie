@@ -9,11 +9,17 @@ import type { Lesson, LessonTranslation } from '@/types';
 interface Props {
     lesson: Lesson;
     isCompleted: boolean;
+    completionEmail?: string;
 }
 
-export default function LessonShow({ lesson, isCompleted }: Props) {
+export default function LessonShow({
+    lesson,
+    isCompleted,
+    completionEmail: initialCompletionEmail = '',
+}: Props) {
     const [locale, setLocale] = useState('en');
     const [completed, setCompleted] = useState(isCompleted);
+    const [completionEmail, setCompletionEmail] = useState(initialCompletionEmail);
 
     const translation = useMemo(() => {
         if (locale === 'en') return null;
@@ -65,10 +71,17 @@ export default function LessonShow({ lesson, isCompleted }: Props) {
     }
 
     function handleMarkComplete() {
-        const email = prompt('Enter your email to mark this lesson as complete:');
-        if (!email) return;
-        router.post(`/lessons/${lesson.slug}/complete`, { email }, {
-            onSuccess: () => setCompleted(true),
+        const email = prompt('Enter your email to mark this lesson as complete:', completionEmail);
+        const normalizedEmail = email?.trim().toLowerCase() ?? '';
+
+        if (!normalizedEmail) return;
+
+        router.post(`/lessons/${lesson.slug}/complete`, { email: normalizedEmail }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setCompleted(true);
+                setCompletionEmail(normalizedEmail);
+            },
         });
     }
 

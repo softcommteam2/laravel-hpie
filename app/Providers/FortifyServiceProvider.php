@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -30,6 +32,7 @@ class FortifyServiceProvider extends ServiceProvider
     {
         $this->configureActions();
         $this->configureViews();
+        $this->configureAuthentication();
         $this->configureRateLimiting();
     }
 
@@ -71,6 +74,32 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
 
         Fortify::confirmPasswordView(fn () => Inertia::render('auth/confirm-password'));
+    }
+
+    /**
+     * Restrict login to admin allowlisted accounts.
+     */
+    private function configureAuthentication(): void
+    {
+        Fortify::authenticateUsing(function (Request $request): ?User {
+            $email = Str::lower(trim((string) $request->string('email')));
+            $user = User::query()->where('email', $email)->first();
+
+            if (! $user || ! Hash::check((string) $request->string('password'), $user->password)) {
+                return null;
+            }
+
+            $adminEmails = collect(config('auth.admin_emails', []))
+                ->map(fn ($email) => Str::lower(trim((string) $email)))
+                ->filter()
+                ->values();
+
+            if ($adminEmails->isEmpty()) {
+                return $user;
+            }
+
+            return $adminEmails->contains(Str::lower($user->email)) ? $user : null;
+        });
     }
 
     /**

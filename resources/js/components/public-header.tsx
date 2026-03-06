@@ -16,6 +16,7 @@ const navLinks = [
 export default function PublicHeader() {
     const { auth } = usePage().props;
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';
+    const isAdmin = !!(auth as { is_admin?: boolean })?.is_admin;
 
     return (
         <header className="border-b bg-white dark:bg-gray-950">
@@ -41,7 +42,7 @@ export default function PublicHeader() {
                 </nav>
 
                 <div className="flex items-center gap-2">
-                    {auth.user ? (
+                    {auth.user && isAdmin ? (
                         <Button asChild variant="outline" size="sm">
                             <Link href="/dashboard">Dashboard</Link>
                         </Button>

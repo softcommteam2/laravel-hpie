@@ -8,8 +8,10 @@ use App\Models\CertificateApplication;
 use App\Models\Contact;
 use App\Models\Feedback;
 use App\Models\Lesson;
+use App\Models\LessonCompletion;
 use App\Models\Speaker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ConnectController extends Controller
@@ -62,13 +64,23 @@ class ConnectController extends Controller
         return back();
     }
 
-    public function applyForm()
+    public function applyForm(Request $request)
     {
         $totalLessons = Lesson::where('is_published', true)->count();
+        $rawEmail = $request->input('email', $request->session()->get('lesson_completion_email', ''));
+        $progressEmail = Str::lower(trim((string) $rawEmail));
+        $completedLessons = 0;
+
+        if ($progressEmail !== '' && filter_var($progressEmail, FILTER_VALIDATE_EMAIL)) {
+            $completedLessons = LessonCompletion::where('email', $progressEmail)
+                ->whereHas('lesson', fn ($q) => $q->where('is_published', true))
+                ->count();
+        }
 
         return Inertia::render('public/connect/apply', [
             'totalLessons' => $totalLessons,
-            'completedLessons' => 0,
+            'completedLessons' => $completedLessons,
+            'progressEmail' => $progressEmail,
         ]);
     }
 

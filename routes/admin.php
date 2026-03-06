@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\SpeakerController;
 use App\Http\Controllers\Admin\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('partners', PartnerController::class);
     Route::resource('lessons', LessonController::class);
     Route::resource('contacts', ContactController::class);

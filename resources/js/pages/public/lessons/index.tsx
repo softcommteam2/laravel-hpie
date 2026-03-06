@@ -1,6 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import { SearchIcon, Share2Icon, BookmarkIcon, EyeIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,12 @@ interface Props {
     subject: string;
     sort: string;
 }
+
+type LessonFilters = {
+    search?: string;
+    subject?: string;
+    sort?: string;
+};
 
 const SUBJECTS = [
     'The Arts',
@@ -35,6 +41,9 @@ const SORT_OPTIONS = [
     { value: 'most_views', label: 'Most Views' },
 ];
 
+const DEBOUNCE_MS = 400;
+const DEFAULT_SORT = 'featured';
+
 export default function LessonsIndex({
     lessons,
     search,
@@ -43,32 +52,97 @@ export default function LessonsIndex({
 }: Props) {
     const [query, setQuery] = useState(search || '');
     const [selectedSubject, setSelectedSubject] = useState(subject || '');
+    const [selectedSort, setSelectedSort] = useState(sort || DEFAULT_SORT);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        setQuery(search || '');
+    }, [search]);
+
+    useEffect(() => {
+        setSelectedSubject(subject || '');
+    }, [subject]);
+
+    useEffect(() => {
+        setSelectedSort(sort || DEFAULT_SORT);
+    }, [sort]);
+
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+        };
+    }, []);
+
+    function buildFilters(
+        nextSearch: string,
+        nextSubject: string,
+        nextSort: string,
+    ): LessonFilters {
+        const filters: LessonFilters = {};
+        const normalizedSearch = nextSearch.trim();
+
+        if (normalizedSearch) {
+            filters.search = normalizedSearch;
+        }
+
+        if (nextSubject) {
+            filters.subject = nextSubject;
+        }
+
+        if (nextSort && nextSort !== DEFAULT_SORT) {
+            filters.sort = nextSort;
+        }
+
+        return filters;
+    }
+
+    function clearDebounce() {
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+            debounceRef.current = null;
+        }
+    }
+
+    function visitLessons(
+        nextSearch: string,
+        nextSubject: string,
+        nextSort: string,
+        replace = false,
+    ) {
+        router.get('/lessons', buildFilters(nextSearch, nextSubject, nextSort), {
+            preserveState: true,
+            preserveScroll: true,
+            replace,
+        });
+    }
+
+    function scheduleDebouncedSearch(nextQuery: string) {
+        clearDebounce();
+        debounceRef.current = setTimeout(() => {
+            visitLessons(nextQuery, selectedSubject, selectedSort, true);
+            debounceRef.current = null;
+        }, DEBOUNCE_MS);
+    }
 
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
-        router.get(
-            '/lessons',
-            { search: query, subject: selectedSubject, sort },
-            { preserveState: true },
-        );
+        clearDebounce();
+        visitLessons(query, selectedSubject, selectedSort, true);
     }
 
     function handleSubjectChange(subj: string) {
         const newSubject = subj === selectedSubject ? '' : subj;
         setSelectedSubject(newSubject);
-        router.get(
-            '/lessons',
-            { search, subject: newSubject, sort },
-            { preserveState: true },
-        );
+        clearDebounce();
+        visitLessons(query, newSubject, selectedSort);
     }
 
     function handleSortChange(newSort: string) {
-        router.get(
-            '/lessons',
-            { search, subject: selectedSubject, sort: newSort },
-            { preserveState: true },
-        );
+        setSelectedSort(newSort);
+        clearDebounce();
+        visitLessons(query, selectedSubject, newSort);
     }
 
     return (
@@ -124,21 +198,22 @@ export default function LessonsIndex({
                         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <form
                                 onSubmit={handleSearch}
-                                className="flex gap-2"
+                                className="w-full sm:w-auto"
                             >
-                                <Input
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                    placeholder="Search lessons..."
-                                    className="w-64"
-                                />
-                                <Button
-                                    type="submit"
-                                    variant="outline"
-                                    size="icon"
-                                >
-                                    <SearchIcon className="size-4" />
-                                </Button>
+                                <div className="relative">
+                                    <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        value={query}
+                                        onChange={(e) => {
+                                            const nextQuery =
+                                                e.currentTarget.value;
+                                            setQuery(nextQuery);
+                                            scheduleDebouncedSearch(nextQuery);
+                                        }}
+                                        placeholder="Search lessons..."
+                                        className="w-full pl-9 sm:w-64"
+                                    />
+                                </div>
                             </form>
 
                             {/* Sort Tabs */}
@@ -151,7 +226,7 @@ export default function LessonsIndex({
                                         }
                                         className={cn(
                                             'rounded-md px-3 py-1.5 text-sm transition-colors',
-                                            sort === option.value
+                                            selectedSort === option.value
                                                 ? 'bg-primary text-primary-foreground'
                                                 : 'text-muted-foreground hover:text-foreground',
                                         )}
@@ -189,15 +264,12 @@ export default function LessonsIndex({
                                         Search: {search}
                                         <button
                                             onClick={() => {
+                                                clearDebounce();
                                                 setQuery('');
-                                                router.get(
-                                                    '/lessons',
-                                                    {
-                                                        subject:
-                                                            selectedSubject,
-                                                        sort,
-                                                    },
-                                                    { preserveState: true },
+                                                visitLessons(
+                                                    '',
+                                                    selectedSubject,
+                                                    selectedSort,
                                                 );
                                             }}
                                             className="ml-1 hover:text-destructive"

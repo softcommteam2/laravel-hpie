@@ -25,7 +25,7 @@ class Speaker extends Model
     {
         return [
             'is_active' => 'boolean',
-            'event_date' => 'date',
+            'event_date' => 'date:Y-m-d',
             'event_time' => 'datetime:H:i',
         ];
     }
